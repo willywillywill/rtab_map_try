@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+  <!--
+    感測器模式：
+    demo     ：發布模擬雷射掃描與相機影像，不需要連接實體硬體。
+    hardware ：讀取 RPLIDAR 與 V4L2 相機的實際資料。
+  -->
+
+  <!-- 是否自動開啟 RViz。 -->
+  <arg name="use_rviz" default="true"/>
+
+
+
+
+  <!-- 實機模式：相機節點與 RPLIDAR 驅動分別發布資料。 -->
+  <group >
+      <include file="$(find rplidar_ros)/launch/rplidar_a1.launch" />
+      <include file="$(find astra_camera)/launch/astra_pro.launch" />
+  </group>
+
+  <!-- 載入已設定好車體、雷射與相機顯示項目的 RViz。 -->
+  <node pkg="rviz" type="rviz" name="rviz" if="$(arg use_rviz)"
+        args="-d $(find car)/rviz/show_car.rviz"/>
+</launch>
+
