@@ -1,0 +1,9 @@
+<launch>
+    <arg name="rvizconfig" default="$(find car)/rviz/show_car.rviz" />
+
+    <node pkg="rviz"
+          type="rviz"
+          name="rviz"
+          args="-d $(find car)/rviz/show_car.rviz"
+          output="screen" />
+</launch>

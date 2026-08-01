@@ -41,7 +41,12 @@ RUN apt install -y \
     libusb-1.0-0-dev \
     ros-noetic-rgbd-launch \
     ros-noetic-backward-ros \
-    udev
+    udev \
+    v4l-utils \
+    ros-noetic-joy \
+    ros-noetic-teleop-twist-joy\
+    usbutils \
+    ros-noetic-robot-state-publisher
 
 # Switch from root to user
 USER $USERNAME

@@ -1,0 +1,114 @@
+<launch>
+      <arg name="max_x" default="1.8" />
+      <arg name="max_z" default="6"/>
+      <arg name="deadzone" default="0.05" />
+
+      <arg name="com_port" default="/dev/ttyUSB0" />
+      <arg name="lidar_port" default="/dev/ttyUSB1" />
+      <arg name="joy_dev" default="/dev/input/js0"/>
+
+
+      
+
+
+      <!-- lidar -->
+      <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+            <param name="serial_port"         type="string" value="$(arg lidar_port)"/>
+            <param name="serial_baudrate"     type="int"    value="115200"/>
+            <param name="frame_id"            type="string" value="laser_link"/>
+            <param name="inverted"            type="bool"   value="false"/>
+            <param name="angle_compensate"    type="bool"   value="true"/>
+      </node>
+
+      <!-- camera -->
+      <include file="$(find astra_camera)/launch/astra_pro.launch">
+            <arg name="camera_name" value="camera"/>
+            <arg name="depth_align" value="true"/>
+            <arg name="enable_point_cloud" value="true"/>
+            <arg name="enable_point_cloud_xyzrgb" value="true"/>
+            <arg name="enable_color" value="true"/>
+            <arg name="enable_depth" value="true"/>
+            <arg name="enable_ir" value="true"/>           
+      </include>
+
+
+      <param name="robot_description"
+           command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
+
+      <!-- TF -->
+      <node pkg="robot_state_publisher"
+            type="robot_state_publisher"
+            name="robot_state_publisher"
+            output="screen">
+            <param name="publish_frequency" value="30"/>
+      </node>
+
+
+      <!-- joy -->
+      <node pkg="joy"
+          type="joy_node"
+          name="joy_node"
+          output="screen">
+            <param name="dev" value="$(arg joy_dev)"/>
+            <param name="deadzone" value="$(arg deadzone)"/>
+            <param name="autorepeat_rate" value="20.0"/>
+      </node>
+
+      <node pkg="car"
+            type="joy_controller.py"
+            name="joy_controller"
+            output="screen">
+
+            <param name="max_x" value="1.8"/>
+            <param name="max_z" value="1.0"/>
+
+            <param name="linear_axis" value="1"/>
+            <param name="angular_axis" value="3"/>
+
+            <param name="invert_linear" value="true"/>
+            <param name="invert_angular" value="false"/>
+
+            <param name="wheelbase" value="0.235"/>
+            <param name="track_width" value="0.13"/>
+            <param name="wheel_radius" value="0.0325"/>
+            <param name="max_steering" value="0.6"/>
+      </node>
+
+      <node pkg="car"
+            type="move.py"
+            name="move_subscriber"
+            output="screen">
+
+            <param name="com_port" value="$(arg com_port)"/>
+
+            <param name="max_vx" value="1.0"/>
+            <param name="max_wz" value="1.0"/>
+
+            <param name="invert_vx" value="false"/>
+            <param name="invert_wz" value="false"/>
+      </node>
+
+      <!-- odom -->
+      <node pkg="car"
+            type="odom_pub.py"
+            name="odom_pub"
+            output="screen">
+
+            <param name="com_port" value="$(arg com_port)" />
+            <param name="baudrate" value="115200"/>
+
+            <param name="odom_frame" value="odom"/>
+            <param name="base_frame" value="base_footprint"/>
+
+            <param name="vx_deadband" value="0.05"/>
+            <param name="wz_deadband" value="0.05"/>
+      </node>
+
+      <!-- rviz -->
+      <node pkg="rviz"
+            type="rviz"
+            name="rviz"
+            args="-d $(find car)/rviz/show_car.rviz"
+            output="screen" />
+
+</launch>
