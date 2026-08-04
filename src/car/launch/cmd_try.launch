@@ -169,7 +169,6 @@
             to="/odom"/>
       </node>
 
-
       <!-- rviz -->
       <node pkg="rviz"
             type="rviz"
