@@ -46,7 +46,9 @@ RUN apt install -y \
     ros-noetic-joy \
     ros-noetic-teleop-twist-joy\
     usbutils \
-    ros-noetic-robot-state-publisher
+    ros-noetic-robot-state-publisher \
+    ros-noetic-rtabmap-ros \
+    mesa-utils
 
 # Switch from root to user
 USER $USERNAME

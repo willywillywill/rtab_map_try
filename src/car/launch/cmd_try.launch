@@ -3,13 +3,9 @@
       <arg name="max_z" default="6"/>
       <arg name="deadzone" default="0.05" />
 
-      <arg name="com_port" default="/dev/ttyUSB0" />
-      <arg name="lidar_port" default="/dev/ttyUSB1" />
+      <arg name="com_port" default="/dev/ttyUSB1" />
+      <arg name="lidar_port" default="/dev/ttyUSB0" />
       <arg name="joy_dev" default="/dev/input/js0"/>
-
-
-      
-
 
       <!-- lidar -->
       <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
@@ -30,7 +26,6 @@
             <arg name="enable_depth" value="true"/>
             <arg name="enable_ir" value="true"/>           
       </include>
-
 
       <param name="robot_description"
            command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
@@ -103,6 +98,77 @@
             <param name="vx_deadband" value="0.05"/>
             <param name="wz_deadband" value="0.05"/>
       </node>
+
+
+
+      <arg name="frame_id"       default="base_link"/>
+      <arg name="camera_frame"   default="camera_link"/>
+      <arg name="scan_topic"     default="/scan"/>
+
+
+      <!-- Astra 相機 Topic -->
+      <arg name="rgb_topic"
+            default="/camera/color/image_raw"/>
+
+      <arg name="depth_topic"
+            default="/camera/depth/image_raw"/>
+
+      <arg name="camera_info_topic"
+            default="/camera/color/camera_info"/>
+
+      <!-- true：刪除舊資料庫，重新建圖 -->
+      <arg name="delete_db_on_start" default="true"/>
+      <arg name="use_rtabmapviz" default="true"/>
+      <node pkg="rtabmap_slam"
+            type="rtabmap"
+            name="rtabmap"
+            output="screen"
+            args="$(eval '--delete_db_on_start' if arg('delete_db_on_start') == 'true' else '')">
+
+      <!-- 座標系 -->
+      <param name="frame_id" value="$(arg frame_id)"/>
+      <param name="map_frame_id" value="map"/>
+      <param name="odom_frame_id" value="odom"/>
+
+      <!-- 感測器輸入 -->
+      <param name="subscribe_depth" value="true"/>
+      <param name="subscribe_rgb" value="true"/>
+      <param name="subscribe_scan" value="true"/>
+
+      <!-- 同步設定 -->
+      <param name="approx_sync" value="true"/>
+      <param name="queue_size" value="30"/>
+
+      <!-- 發布 map -> odom -->
+      <param name="publish_tf" value="true"/>
+
+      <!-- 平面機器人設定 -->
+      <param name="Reg/Force3DoF" value="true"/>
+      <param name="RGBD/NeighborLinkRefining" value="true"/>
+      <param name="RGBD/ProximityBySpace" value="true"/>
+
+      <!-- 2D 障礙地圖 -->
+      <param name="Grid/FromDepth" value="false"/>
+      <param name="Grid/RangeMax" value="6.0"/>
+      <param name="Grid/CellSize" value="0.05"/>
+
+      <!-- Topic 映射 -->
+      <remap from="rgb/image"
+            to="$(arg rgb_topic)"/>
+
+      <remap from="depth/image"
+            to="$(arg depth_topic)"/>
+
+      <remap from="rgb/camera_info"
+            to="$(arg camera_info_topic)"/>
+
+      <remap from="scan"
+            to="$(arg scan_topic)"/>
+
+      <remap from="odom"
+            to="/odom"/>
+      </node>
+
 
       <!-- rviz -->
       <node pkg="rviz"

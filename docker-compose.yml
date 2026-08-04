@@ -9,11 +9,17 @@ services:
       - /dev:/dev
       - /dev/bus/usb:/dev/bus/usb
     environment:
-      - DISPLAY=192.168.31.54:0.0
+      - DISPLAY=:0
+      - ROS_MASTER_URI=http://192.168.31.60:11311
+      - export ROS_IP=192.168.31.60
       - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE="0"
+
 
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/bus/usb:/dev/bus/usb
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/tmp/docker.xauth:ro
       - .:/ros_ws
     working_dir: /ros_ws
 
