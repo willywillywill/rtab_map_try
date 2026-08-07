@@ -146,3 +146,5 @@ if __name__ == "__main__":
 
     odom = Odom(bot)
     odom.run()
+
+    del bot

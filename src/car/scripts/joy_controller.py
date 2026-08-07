@@ -21,7 +21,7 @@ class JoyController:
 
         # 搖桿 axis
         self.linear_axis = rospy.get_param("~linear_axis", 1)
-        self.angular_axis = rospy.get_param("~angular_axis", 3)
+        self.angular_axis = rospy.get_param("~angular_axis", 2)
         self.invert_linear = rospy.get_param("~invert_linear", True)
         self.invert_angular = rospy.get_param("~invert_angular", False)
 
@@ -31,7 +31,7 @@ class JoyController:
         self.wheel_radius = rospy.get_param("~wheel_radius", 0.0325)
 
         # URDF 前輪最大轉向角
-        self.max_steering = rospy.get_param("~max_steering", 0.6)
+        self.max_steering = rospy.get_param("~max_steering", 3)
 
         # 搖桿逾時保護
         self.joy_timeout = rospy.get_param("~joy_timeout", 0.5)

@@ -22,7 +22,7 @@ RUN apt install -y ros-noetic-rviz
 RUN apt install -y nano
 RUN apt install ros-noetic-turtlesim -y
 RUN apt install ros-noetic-slam-gmapping -y
-RUN apt install ros-noetic-teleop-twist-keyboard
+RUN apt install ros-noetic-teleop-twist-keyboard -y
 RUN apt install ros-noetic-navigation -y
 RUN apt install ros-noetic-hector-mapping
 RUN apt install ros-noetic-rqt-tf-tree -y
@@ -48,7 +48,11 @@ RUN apt install -y \
     usbutils \
     ros-noetic-robot-state-publisher \
     ros-noetic-rtabmap-ros \
-    mesa-utils
+    mesa-utils \
+    ros-noetic-ackermann-steering-controller \
+    ros-noetic-ros-control \
+    ros-noetic-ros-controllers \
+    ros-noetic-ackermann-msgs
 
 # Switch from root to user
 USER $USERNAME

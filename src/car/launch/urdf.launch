@@ -1,0 +1,14 @@
+<launch>
+    <param name="robot_description"
+           command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
+
+    <!-- TF -->
+    <node pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        name="robot_state_publisher"
+        output="screen">
+        <param name="publish_frequency" value="30"/>
+    </node>
+
+
+</launch>

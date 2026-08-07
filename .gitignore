@@ -6,3 +6,12 @@ core
 core.*
 *.bag
 .vscode/
+
+# RTAB-Map database
+*.db
+
+# RTAB-Map generated files
+*.db
+*.db-journal
+*.pcd
+*.bag

@@ -1,10 +1,10 @@
 <launch>
-      <arg name="max_x" default="1.8" />
-      <arg name="max_z" default="6"/>
+      <arg name="max_x" default="1.0" />
+      <arg name="max_z" default="6.0"/>
       <arg name="deadzone" default="0.05" />
 
-      <arg name="com_port" default="/dev/ttyUSB1" />
-      <arg name="lidar_port" default="/dev/ttyUSB0" />
+      <arg name="com_port" default="/dev/ttyUSB0" />
+      <arg name="lidar_port" default="/dev/ttyUSB1" />
       <arg name="joy_dev" default="/dev/input/js0"/>
 
       <!-- lidar -->
@@ -15,6 +15,7 @@
             <param name="inverted"            type="bool"   value="false"/>
             <param name="angle_compensate"    type="bool"   value="true"/>
       </node>
+
 
       <!-- camera -->
       <include file="$(find astra_camera)/launch/astra_pro.launch">
@@ -27,153 +28,21 @@
             <arg name="enable_ir" value="true"/>           
       </include>
 
-      <param name="robot_description"
-           command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
+      <!-- URDF  -->
+      <include file="$(find car)/launch/urdf.launch"/>
 
-      <!-- TF -->
-      <node pkg="robot_state_publisher"
-            type="robot_state_publisher"
-            name="robot_state_publisher"
-            output="screen">
-            <param name="publish_frequency" value="30"/>
-      </node>
+      <!-- joy_cmd  -->
+      <include file="$(find car)/launch/joy_cmd.launch">
+            <arg name="com_port" value="$(arg com_port)"/>
+            <arg name="joy_dev" value="$(arg joy_dev)"/>
+            <arg name="max_x" value="$(arg max_x)"/>
+            <arg name="max_z" value="$(arg max_z)"/>
+            <arg name="deadzone" value="$(arg deadzone)"/>
+      </include>
 
-
-      <!-- joy -->
-      <node pkg="joy"
-          type="joy_node"
-          name="joy_node"
-          output="screen">
-            <param name="dev" value="$(arg joy_dev)"/>
-            <param name="deadzone" value="$(arg deadzone)"/>
-            <param name="autorepeat_rate" value="20.0"/>
-      </node>
-
-      <node pkg="car"
-            type="joy_controller.py"
-            name="joy_controller"
-            output="screen">
-
-            <param name="max_x" value="1.8"/>
-            <param name="max_z" value="1.0"/>
-
-            <param name="linear_axis" value="1"/>
-            <param name="angular_axis" value="3"/>
-
-            <param name="invert_linear" value="true"/>
-            <param name="invert_angular" value="false"/>
-
-            <param name="wheelbase" value="0.235"/>
-            <param name="track_width" value="0.13"/>
-            <param name="wheel_radius" value="0.0325"/>
-            <param name="max_steering" value="0.6"/>
-      </node>
-
-      <node pkg="car"
-            type="move.py"
-            name="move_subscriber"
-            output="screen">
-
-            <param name="com_port" value="$(arg com_port)"/>
-
-            <param name="max_vx" value="1.0"/>
-            <param name="max_wz" value="1.0"/>
-
-            <param name="invert_vx" value="false"/>
-            <param name="invert_wz" value="false"/>
-      </node>
-
-      <!-- odom -->
-      <node pkg="car"
-            type="odom_pub.py"
-            name="odom_pub"
-            output="screen">
-
-            <param name="com_port" value="$(arg com_port)" />
-            <param name="baudrate" value="115200"/>
-
-            <param name="odom_frame" value="odom"/>
-            <param name="base_frame" value="base_footprint"/>
-
-            <param name="vx_deadband" value="0.05"/>
-            <param name="wz_deadband" value="0.05"/>
-      </node>
-
-
-
-      <arg name="frame_id"       default="base_link"/>
-      <arg name="camera_frame"   default="camera_link"/>
-      <arg name="scan_topic"     default="/scan"/>
-
-
-      <!-- Astra 相機 Topic -->
-      <arg name="rgb_topic"
-            default="/camera/color/image_raw"/>
-
-      <arg name="depth_topic"
-            default="/camera/depth/image_raw"/>
-
-      <arg name="camera_info_topic"
-            default="/camera/color/camera_info"/>
-
-      <!-- true：刪除舊資料庫，重新建圖 -->
-      <arg name="delete_db_on_start" default="true"/>
-      <arg name="use_rtabmapviz" default="true"/>
-      <node pkg="rtabmap_slam"
-            type="rtabmap"
-            name="rtabmap"
-            output="screen"
-            args="$(eval '--delete_db_on_start' if arg('delete_db_on_start') == 'true' else '')">
-
-      <!-- 座標系 -->
-      <param name="frame_id" value="$(arg frame_id)"/>
-      <param name="map_frame_id" value="map"/>
-      <param name="odom_frame_id" value="odom"/>
-
-      <!-- 感測器輸入 -->
-      <param name="subscribe_depth" value="true"/>
-      <param name="subscribe_rgb" value="true"/>
-      <param name="subscribe_scan" value="true"/>
-
-      <!-- 同步設定 -->
-      <param name="approx_sync" value="true"/>
-      <param name="queue_size" value="30"/>
-
-      <!-- 發布 map -> odom -->
-      <param name="publish_tf" value="true"/>
-
-      <!-- 平面機器人設定 -->
-      <param name="Reg/Force3DoF" value="true"/>
-      <param name="RGBD/NeighborLinkRefining" value="true"/>
-      <param name="RGBD/ProximityBySpace" value="true"/>
-
-      <!-- 2D 障礙地圖 -->
-      <param name="Grid/FromDepth" value="false"/>
-      <param name="Grid/RangeMax" value="6.0"/>
-      <param name="Grid/CellSize" value="0.05"/>
-
-      <!-- Topic 映射 -->
-      <remap from="rgb/image"
-            to="$(arg rgb_topic)"/>
-
-      <remap from="depth/image"
-            to="$(arg depth_topic)"/>
-
-      <remap from="rgb/camera_info"
-            to="$(arg camera_info_topic)"/>
-
-      <remap from="scan"
-            to="$(arg scan_topic)"/>
-
-      <remap from="odom"
-            to="/odom"/>
-      </node>
-
-      <!-- rviz -->
-      <node pkg="rviz"
-            type="rviz"
-            name="rviz"
-            args="-d $(find car)/rviz/show_car.rviz"
-            output="screen" />
+      <!-- rtabmap_lidar -->
+      <include file="$(find car)/launch/rtabmap.launch">
+            <arg name="delete_db_on_start" value="true"/>
+      </include>
 
 </launch>

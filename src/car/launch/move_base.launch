@@ -1,8 +1,17 @@
 <launch>
+  <arg name="cmd_vel_topic" default="/move_topic"/>
+  <arg name="odom_topic" default="/odom"/>
+  <!-- rtabmap_slam publishes its 2-D occupancy grid on this private topic. -->
+  <arg name="map_topic" default="/rtabmap/grid_map"/>
+
   <node pkg="move_base"
         type="move_base"
         name="move_base"
-        output="screen">
+        output="screen"
+        clear_params="true">
+
+    <rosparam file="$(find car)/config/move_base.yaml"
+              command="load"/>
 
     <rosparam file="$(find car)/config/costmap_common.yaml"
               command="load"
@@ -15,10 +24,16 @@
     <rosparam file="$(find car)/config/global_costmap.yaml"
               command="load"/>
 
+    <param name="global_costmap/static_layer/map_topic"
+           value="$(arg map_topic)"/>
+
     <rosparam file="$(find car)/config/local_costmap.yaml"
               command="load"/>
 
     <rosparam file="$(find car)/config/base_local_planner.yaml"
               command="load"/>
+
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
   </node>
 </launch>
