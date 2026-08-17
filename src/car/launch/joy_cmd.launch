@@ -1,86 +1,27 @@
 <launch>
 
-      <arg name="com_port" default="/dev/ttyUSB0" />
-      <arg name="joy_dev" default="/dev/input/js0"/>
-
-      <arg name="max_x" default="1" />
-      <arg name="max_z" default="6"/>
       <arg name="deadzone" default="0.05" />
+      <arg name="joy_dev" default="/dev/input/js0" />
+      <arg name="com_port" default="/dev/ttyUSB0" />
 
-      <arg name="wheelbase" default="0.060236"/>
-      <arg name="max_steering_angle" default="0.10"/>
-      <arg name="min_speed" default="0.05"/>
-      <arg name="invert_vx" default="true"/>
-      <arg name="invert_wz" default="false"/>
-
-      <!-- joy 
-            joy -> joy_controller -> twist_to_ackermann -> ackermann_driver
-               joy            move_topic           ackermann_cmd
-      
-      -->
-      <node pkg="joy"
-          type="joy_node"
-          name="joy_node">
+      <node pkg="joy" type="joy_node" name="joy_node">
             <param name="dev" value="$(arg joy_dev)"/>
             <param name="deadzone" value="$(arg deadzone)"/>
             <param name="autorepeat_rate" value="20.0"/>
       </node>
 
-      <node pkg="car"
-            type="joy_controller.py"
-            name="joy_controller"
-            output="screen">
-
-            <param name="max_x" value="$(arg max_x)"/>
-            <param name="max_z" value="$(arg max_z)"/>
-            <param name="deadzone" value="$(arg deadzone)"/>
-
-      </node>      
-
-      <node pkg="car"
-            type="twist_to_ackermann.py"
-            name="twist_to_ackermann"
-            output="screen">
-
-            <param name="input_topic" value="/move_topic"/>
-            <param name="output_topic" value="/ackermann_cmd"/>
-            <param name="wheelbase" value="$(arg wheelbase)"/>
-            <param name="min_speed" value="$(arg min_speed)"/>
-            <param name="frame_id" value="base_link"/>
+      <node pkg="car" type="joy2ackermann.py" name="joy2ackermann">
+            <param name="linear_axis"  value="1"/>
+            <param name="angular_axis" value="2"/>
+            <!-- max 1.5 -->
+            <param name="max_x" value="0.5"/>
+            <!-- max 6.0 -->
+            <param name="max_z" value="1.0"/>
       </node>
-
-      <node pkg="car"
-            type="ackermann_driver.py"
-            name="ackermann_driver"
-            output="screen">
-
-            <param name="com_port" value="$(arg com_port)"/>
-            <param name="input_topic" value="/ackermann_cmd"/>
-
-            <param name="wheelbase" value="$(arg wheelbase)"/>
-            <param name="max_x" value="$(arg max_x)"/>
-            <param name="max_z" value="$(arg max_z)"/>
-            <param name="max_steering_angle" value="$(arg max_steering_angle)"/>
-
-            <param name="invert_vx" value="$(arg invert_vx)"/>
-            <param name="invert_wz" value="$(arg invert_wz)"/>
-      </node>
-
-      <!-- odom -->
-      <node pkg="car"
-            type="odom_pub.py"
-            name="odom_pub">
-
+      
+      <node pkg="car" type="rosmaster_driver.py" name="rosmaster_driver">
             <param name="com_port" value="$(arg com_port)" />
-            <param name="baudrate" value="115200"/>
-
-            <param name="odom_frame" value="odom"/>
-            <param name="base_frame" value="base_footprint"/>
-
-            <param name="vx_deadband" value="$(arg deadzone)"/>
-            <param name="wz_deadband" value="$(arg deadzone)"/>
       </node>
-
 
 
 </launch>

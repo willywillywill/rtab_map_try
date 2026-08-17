@@ -1,14 +1,28 @@
 <launch>
+
+
+    <arg name="wheelbase" default="0.235" />
+    <arg name="track_width" default="0.168" />
+    <arg name="wheel_radius" default="0.0325" />
+
     <param name="robot_description"
-           command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
+            command="$(find xacro)/xacro '$(find yahboomcar_description)/urdf/yahboomcar_R2.urdf.xacro'"/>
 
     <!-- TF -->
     <node pkg="robot_state_publisher"
-        type="robot_state_publisher"
-        name="robot_state_publisher"
-        output="screen">
-        <param name="publish_frequency" value="30"/>
+            type="robot_state_publisher"
+            name="robot_state_publisher"
+            output="screen">
+            <param name="publish_frequency" value="30"/>
     </node>
+
+    <!--node pkg="car" type="joy_urdf.py"  name="joy_urdf" output="screen">
+            <param name="wheelbase" value="0.235"/>
+            <param name="track_width" value="0.168"/>
+            <param name="wheel_radius" value="0.0325"/>
+    </node-->
+    
+    
 
 
 </launch>

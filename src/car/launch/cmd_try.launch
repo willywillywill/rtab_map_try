@@ -1,6 +1,8 @@
 <launch>
-      <arg name="max_x" default="1.0" />
-      <arg name="max_z" default="6.0"/>
+      <!-- 1.5 -->
+      <arg name="max_x" default="0.5" />
+      <!-- 6.0 -->
+      <arg name="max_z" default="3.0"/>
       <arg name="deadzone" default="0.05" />
 
       <arg name="com_port" default="/dev/ttyUSB0" />
@@ -42,7 +44,6 @@
 
       <!-- rtabmap_lidar -->
       <include file="$(find car)/launch/rtabmap.launch">
-            <arg name="delete_db_on_start" value="true"/>
       </include>
 
 </launch>

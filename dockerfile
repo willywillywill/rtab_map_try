@@ -44,7 +44,7 @@ RUN apt install -y \
     udev \
     v4l-utils \
     ros-noetic-joy \
-    ros-noetic-teleop-twist-joy\
+    ros-noetic-teleop-twist-joy \
     usbutils \
     ros-noetic-robot-state-publisher \
     ros-noetic-rtabmap-ros \

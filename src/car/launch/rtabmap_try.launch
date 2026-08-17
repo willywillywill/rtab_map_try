@@ -103,7 +103,7 @@
        <!-- 建圖 -->
        <param name="Mem/IncrementalMemory"
               type="bool"
-              value="false"/>
+              value="true"/>
 
        <param name="Mem/InitWMWithAllNodes"
               type="bool"

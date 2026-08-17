@@ -1,0 +1,37 @@
+<launch>
+    
+    <!-- camera -->
+    <include file="$(find astra_camera)/launch/astra_pro.launch">
+        <arg name="camera_name" value="camera"/>
+        <arg name="depth_align" value="true"/>
+        <arg name="enable_point_cloud" value="true"/>
+        <arg name="enable_point_cloud_xyzrgb" value="true"/>
+        <arg name="enable_color" value="true"/>
+        <arg name="enable_depth" value="true"/>
+        <arg name="enable_ir" value="true"/>           
+    </include>
+
+    <arg name="lidar_port" default="/dev/ttyUSB1" />
+    <!-- lidar -->
+    <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+            <param name="serial_port"         type="string" value="$(arg lidar_port)"/>
+            <param name="serial_baudrate"     type="int"    value="115200"/>
+            <param name="frame_id"            type="string" value="laser_link"/>
+            <param name="inverted"            type="bool"   value="false"/>
+            <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
+    <include file="$(find car)/launch/joy_cmd.launch" />
+
+    <include file="$(find car)/launch/urdf.launch" />
+    
+    <!-- rtabmap_lidar -->
+    <include file="$(find car)/launch/rtabmap.launch">
+    </include>
+
+    <!-- move_base -->
+    <include file="$(find car)/launch/move_base.launch">
+    </include>
+
+
+</launch>
