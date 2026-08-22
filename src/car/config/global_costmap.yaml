@@ -1,11 +1,12 @@
 global_costmap:
   global_frame: map
   robot_base_frame: base_link
-  update_frequency: 3.0
+  update_frequency: 2.0
   publish_frequency: 1.0
   transform_tolerance: 0.5
   rolling_window: false
   track_unknown_space: true
+  always_send_full_costmap: false
 
   plugins:
     - {name: static_layer, type: "costmap_2d::StaticLayer"}
@@ -14,5 +15,5 @@ global_costmap:
 
   static_layer:
     enabled: true
-    map_topic: /rtabmap/grid_map
+    map_topic: /grid_map
     subscribe_to_updates: true

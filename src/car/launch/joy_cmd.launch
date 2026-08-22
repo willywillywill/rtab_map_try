@@ -2,23 +2,29 @@
 
       <arg name="deadzone" default="0.05" />
       <arg name="joy_dev" default="/dev/input/js0" />
-      <arg name="com_port" default="/dev/ttyUSB0" />
+      <arg name="com_port" default="/dev/ttyUSB1" />
 
       <node pkg="joy" type="joy_node" name="joy_node">
             <param name="dev" value="$(arg joy_dev)"/>
             <param name="deadzone" value="$(arg deadzone)"/>
-            <param name="autorepeat_rate" value="20.0"/>
+            <param name="autorepeat_rate" value="10.0"/>
       </node>
 
-      <node pkg="car" type="joy2ackermann.py" name="joy2ackermann">
-            <param name="linear_axis"  value="1"/>
-            <param name="angular_axis" value="2"/>
-            <!-- max 1.5 -->
-            <param name="max_x" value="0.5"/>
-            <!-- max 6.0 -->
-            <param name="max_z" value="1.0"/>
-      </node>
       
+      <node pkg="car"
+            type="joy2ackermann.py"
+            name="joy2ackermann"
+            output="screen">
+            <param name="publish_rate" value="10" />
+            <param name="linear_axis" value="1"/>
+            <param name="angular_axis" value="2"/>
+            <param name="wheelbase" value="0.235"/>
+            <param name="max_x" value="1.0"/>
+            <param name="max_z" value="3.0"/>
+
+      </node>
+
+
       <node pkg="car" type="rosmaster_driver.py" name="rosmaster_driver">
             <param name="com_port" value="$(arg com_port)" />
       </node>

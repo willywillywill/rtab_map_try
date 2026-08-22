@@ -1,0 +1,31 @@
+<launch>
+    <arg name="cmd_vel_topic" default="/cmd_vel"/>
+    <arg name="odom_topic" default="/odom"/>
+    <!-- rtabmap_slam publishes its 2-D occupancy grid on this private topic. -->
+    <arg name="map_topic" default="/grid_map"/>
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        
+        <!-- 設定全局與局部規劃器 -->
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        
+        <!-- 頻率設定 -->
+        <param name="planner_frequency" value="2.0" />
+        <param name="controller_frequency" value="10.0" />
+        <param name="planner_patience" value="5.0" />
+        <param name="controller_patience" value="15.0" />
+        
+        <!-- 載入參數檔案 (請依據你的 Package 名稱修改路徑) -->
+        <rosparam file="$(find car)/config/teb/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find car)/config/teb/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find car)/config/teb/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find car)/config/teb/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find car)/config/teb/teb_local_planner_params.yaml" command="load" />
+        
+        <param name="global_costmap/static_layer/map_topic"
+           value="$(arg map_topic)"/>
+        <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+        <remap from="odom" to="$(arg odom_topic)"/>
+
+    </node>
+</launch>

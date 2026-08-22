@@ -1,34 +1,60 @@
-base_local_planner: "base_local_planner/TrajectoryPlannerROS"
+TebLocalPlannerROS:
 
-TrajectoryPlannerROS:
-  holonomic_robot: false
-
-  max_vel_x: 0.45
-  min_vel_x: 0.05
-  max_vel_theta: 0.9
-  min_vel_theta: -0.9
-  min_in_place_vel_theta: 0.35
-
+  odom_topic: odom
+  map_frame: /map
+  
+  # ===== 機器人動力學與運動學限制 (Kinematics) =====
+  teb_autosize: True
+  dt_ref: 0.2
+  dt_hysteresis: 0.1
+  global_plan_overwrite_orientation: True
+  max_global_plan_lookahead_dist: 2.5
+  feasibility_check_no_poses: 4
+    
+  # 速度與加速度限制
+  max_vel_x: 0.35
+  max_vel_x_backwards: 0.25     # 允許倒車的最大速度
+  max_vel_y: 0.0                 # 非全向車，Y 軸速度必須為 0
+  max_vel_theta: 0.85            # 最大角速度
   acc_lim_x: 0.8
-  acc_lim_y: 0.0
   acc_lim_theta: 1.5
 
-  yaw_goal_tolerance: 0.12
-  xy_goal_tolerance: 0.15
-  latch_xy_goal_tolerance: true
+  # ***************** 阿克曼 (Ackermann) 轉向關鍵設定 *****************
+  min_turning_radius: 0.35        # 機器人的最小轉彎半徑 (米)，請依據實體車調整！
+  wheelbase: 0.235                # 前輪軸與後輪軸的距離 (米)
+  cmd_angle_towards_home: False
+  # *******************************************************************
 
-  sim_time: 1.7
-  sim_granularity: 0.025
-  angular_sim_granularity: 0.025
-  vx_samples: 10
-  vtheta_samples: 20
+  # ===== 目標公差 (Goal Tolerance) =====
+  xy_goal_tolerance: 0.15        # 位置公差 (米)
+  yaw_goal_tolerance: 0.20       # 角度公差 (弧度，約 11 度)
+  free_goal_vel: False           # 抵達目標點時速度是否必須歸零
 
-  meter_scoring: true
-  path_distance_bias: 0.6
-  goal_distance_bias: 0.8
-  occdist_scale: 0.02
-  heading_lookahead: 0.325
-  dwa: true
+  # ===== 障礙物避障設定 (Obstacles) =====
+  min_obstacle_dist: 0.12        # 機器人與障礙物的最小安全距離
+  include_costmap_obstacles: True
+  costmap_obstacles_behind_robot_dist: 1.2
+  obstacle_poses_affected: 25
+  costmap_converter_plugin: ""
 
-  oscillation_reset_dist: 0.10
-  escape_vel: -0.10
+  # ===== 最佳化與權重設定 (Optimization) =====
+  no_inner_iterations: 5
+  no_outer_iterations: 4
+  optimization_activate: True
+  optimization_verbose: False
+  penalty_epsilon: 0.1
+  
+  # 權重參數 (可以調整運算傾向)
+  weight_max_vel_x: 5.0
+  weight_max_vel_theta: 1
+  weight_acc_lim_x: 1
+  weight_acc_lim_theta: 1
+  weight_kinematics_nh: 1000     # 非全向限制權重 (設極大以防止橫移)
+  weight_kinematics_forward_drive: 0.0
+  weight_kinematics_turning_radius: 5.0 # 強制遵守最小轉彎半徑限制
+  weight_optimaltime: 1.5          # 時間最佳化權重
+  weight_obstacle: 30            # 避障權重
+
+ # ===== 多路徑規劃 =====
+  enable_homotopy_class_planning: False
+  enable_multithreading: True

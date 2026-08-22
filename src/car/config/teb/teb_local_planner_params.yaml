@@ -1,0 +1,80 @@
+# ==============================================================================
+# TEB Local Planner Configuration
+# Designed for Ackermann / Non-holonomic Mobile Robots
+# ==============================================================================
+
+TebLocalPlannerROS:
+
+  odom_topic: odom
+  map_frame: /map
+  
+  # ===== Trajectory & Kinematics Configuration =====
+  teb_autosize: True
+  dt_ref: 0.3
+  dt_hysteresis: 0.1
+  global_plan_overwrite_orientation: True
+  max_global_plan_lookahead_dist: 3.0
+  feasibility_check_no_poses: 5
+    
+  # Velocity & Acceleration Limits
+  max_vel_x: 0.35
+  max_vel_x_backwards: 0.15          # 允許倒車的最大速度
+  max_vel_y: 0.0                      # 非全向車，Y軸速度必須為 0
+  max_vel_theta: 0.75                 # 最大角速度
+  acc_lim_x: 0.5
+  acc_lim_theta: 1.0
+
+  # ***************** Ackermann Kinematics Settings *****************
+  min_turning_radius: 0.5             # 機器人最小轉彎半徑 (米)，請根據實體車調整
+  wheelbase: 0.25                     # 前軸與後軸距離 (米)
+  cmd_angle_towards_home: False
+  # *****************************************************************
+
+  # ===== Goal Tolerance =====
+  xy_goal_tolerance: 0.15             # 位置容忍度 (米)
+  yaw_goal_tolerance: 0.20            # 角度容忍度 (弧度，約 11.5 度)
+  free_goal_vel: False                # 抵達目標點時是否停止
+
+  # ===== Obstacle Avoidance =====
+  min_obstacle_dist: 0.25             # 避障最小安全距離
+  include_costmap_obstacles: True
+  costmap_obstacles_behind_robot_dist: 1.0
+  obstacle_poses_affected: 30
+  costmap_converter_plugin: ""
+
+  # ===== Optimization & Weights =====
+  no_inner_iterations: 5
+  no_outer_iterations: 4
+  optimization_activate: True
+  optimization_verbose: False
+  penalty_epsilon: 0.1
+  
+  weight_max_vel_x: 2
+  weight_max_vel_theta: 1
+  weight_acc_lim_x: 1
+  weight_acc_lim_theta: 1
+  weight_kinematics_nh: 1000          # 非全向限制權重 (極大以防止橫移)
+  weight_kinematics_forward_drive: 2.0# 鼓勵優先向前開
+  weight_kinematics_turning_radius: 10.0 # 強制遵守最小轉彎半徑
+  weight_optimaltime: 1
+  weight_obstacle: 50                 # 避障權重
+  weight_dynamic_obstacle: 10
+
+  # ===== Parallel Planning / Homotopy Classes =====
+  enable_homotopy_class_planning: False # 關閉多路徑搜尋以節省 CPU 資源
+  enable_multithreading: True
+  simple_exploration: False
+  max_number_classes: 2
+  
+  selection_cost_hysteresis: 1.0
+  selection_obst_cost_scale: 100.0
+  selection_violation_cost_scale: 1.0
+  selection_alternative_time_cost_scale: 1.0
+
+  roadmap_graph_no_samples: 15
+  roadmap_graph_area_width: 5
+  h_signature_prescaler: 0.5
+  h_signature_threshold: 0.1
+  obstacle_keypoint_offset: 0.1
+  obstacle_heading_threshold: 0.45
+  visualize_hc_graph: False

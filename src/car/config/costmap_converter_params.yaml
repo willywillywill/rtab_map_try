@@ -1,0 +1,5 @@
+TebLocalPlannerROS:
+  # 如果硬體效能有限，保持預設空白即可
+  costmap_converter_plugin: ""
+  costmap_converter_spin_thread: True
+  costmap_converter_rate: 5

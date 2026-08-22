@@ -1,0 +1,35 @@
+# ==============================================================================
+# Common Costmap Configuration (Shared by Global and Local Costmaps)
+# ==============================================================================
+
+# 機器人外型輪廓 (選擇以多邊形 footprint 或圓形 robot_radius)
+# 對於矩形/阿克曼車體，建議使用 footprint:
+footprint: [[-0.2, -0.15], [-0.2, 0.15], [0.3, 0.15], [0.3, -0.15]]
+# robot_radius: 0.25
+
+transform_tolerance: 0.5
+
+# 障礙物圖層設定
+obstacle_layer:
+  enabled: true
+  obstacle_range: 2.5
+  raytrace_range: 3.0
+  max_obstacle_height: 2.0
+  unknown_threshold: 15
+  mark_threshold: 0
+  combination_method: 1
+  track_unknown_space: true
+  obstacle_legend: true
+  observation_sources: scan
+  scan:
+    sensor_frame: laser_frame
+    data_type: LaserScan
+    topic: scan
+    marking: true
+    clearing: true
+
+# 障礙物膨脹圖層
+inflation_layer:
+  enabled: true
+  cost_scaling_factor: 10.0   # 數值越大，Cost 隨距離下降越快
+  inflation_radius: 0.20     # 障礙物周圍膨脹半徑 (米)

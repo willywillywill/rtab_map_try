@@ -27,7 +27,7 @@ RUN apt install ros-noetic-navigation -y
 RUN apt install ros-noetic-hector-mapping
 RUN apt install ros-noetic-rqt-tf-tree -y
 RUN apt install -y ros-noetic-xacro
-RUN apt install -y \
+RUN apt-get install -y \
     ros-noetic-cv-bridge \
     ros-noetic-image-transport \
     ros-noetic-camera-info-manager \
@@ -52,7 +52,8 @@ RUN apt install -y \
     ros-noetic-ackermann-steering-controller \
     ros-noetic-ros-control \
     ros-noetic-ros-controllers \
-    ros-noetic-ackermann-msgs
+    ros-noetic-ackermann-msgs \
+    ros-noetic-foxglove-bridge
 
 # Switch from root to user
 USER $USERNAME

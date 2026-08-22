@@ -7,3 +7,11 @@
           args="-d $(find car)/rviz/show_car.rviz"
           output="screen" />
 </launch>
+
+
+<!--
+
+roslaunch foxglove_bridge foxglove_bridge.launch \
+  send_buffer_limit:=100000000
+  
+-->

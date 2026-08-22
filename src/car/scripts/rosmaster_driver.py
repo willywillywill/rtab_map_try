@@ -12,6 +12,10 @@ from Rosmaster_Lib import Rosmaster
 def normalize_angle(angle):
     return math.atan2(math.sin(angle), math.cos(angle))
 
+def clamp_zero(value, threshold):
+    if abs(value) < threshold:
+        return 0.0
+    return value
 
 class RosmasterDriver:
     def __init__(self, bot):
@@ -25,6 +29,12 @@ class RosmasterDriver:
         self.y = 0.0
         self.yaw_offset = None
         self.last_time = rospy.Time.now()
+        self.last_yaw = 0.0
+
+        # 這幾個可以依照你的實際雜訊調整
+        self.vx_deadband = rospy.get_param("~vx_deadband", 0.05)
+        self.vy_deadband = rospy.get_param("~vy_deadband", 0.05)
+        self.wz_deadband = rospy.get_param("~wz_deadband", 0.05)
 
         self.odom_pub = rospy.Publisher(
             "/odom",
@@ -34,11 +44,12 @@ class RosmasterDriver:
         self.tf_broadcaster = tf.TransformBroadcaster()
 
         self.cmd_sub = rospy.Subscriber(
-            "/joy2ackermann",
+            "/ackermann_cmd",
             AckermannDriveStamped,
             self.command_callback,
-            queue_size=1,
+            queue_size=10,
         )
+        self.bot.set_car_motion(0.0, 0.0, 0.0)
 
         rospy.on_shutdown(self.shutdown)
 
@@ -76,6 +87,20 @@ class RosmasterDriver:
                 self.yaw_offset = imu_yaw
 
             yaw = normalize_angle(imu_yaw - self.yaw_offset)
+
+            vy = 0.0
+
+            vx = clamp_zero(vx, self.vx_deadband)
+            vy = clamp_zero(vy, self.vy_deadband)
+            vz = clamp_zero(vz, self.wz_deadband)
+
+            if abs(vx) < self.vx_deadband and abs(vz) < self.wz_deadband:
+                vx = 0.0
+                vy = 0.0
+                vz = 0.0
+                yaw = self.last_yaw
+            else:
+                self.last_yaw = yaw
 
             vx_world = vx * math.cos(yaw) - vy * math.sin(yaw)
             vy_world = vx * math.sin(yaw) + vy * math.cos(yaw)
