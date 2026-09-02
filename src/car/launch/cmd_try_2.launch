@@ -3,6 +3,7 @@
     <!-- camera -->
     <include file="$(find astra_camera)/launch/astra_pro.launch">
         <arg name="camera_name" value="camera"/>
+        
         <arg name="depth_align" value="true"/>
         <arg name="enable_point_cloud" value="true"/>
         <arg name="enable_point_cloud_xyzrgb" value="true"/>
@@ -46,7 +47,7 @@
 
         <!-- 每張都辨識 -->
         <param name="inference_every_n_frames"
-            value="1"/>
+            value="3"/>
 
         <!-- bbox 中央 40% 計算 depth -->
         <param name="depth_center_ratio"
