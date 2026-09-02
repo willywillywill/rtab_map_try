@@ -4,6 +4,9 @@
        <arg name="database_path"
          default="/ros_ws/src/car/maps/my_map.db"/>
 
+       <!-- 模式切換：true 為純定位模式，false 為建圖模式 -->
+       <arg name="localization" default="true"/>
+
        <node pkg="rtabmap_slam"
               type="rtabmap"
               name="rtabmap"
@@ -57,13 +60,14 @@
        <param name="RGBD/NeighborLinkRefining" type="bool" value="true"/>
        <param name="RGBD/ProximityBySpace" type="bool" value="true"/>
        <param name="RGBD/ProximityPathMaxNeighbors" type="int" value="5"/>
+       <param name="RGBD/MaxOdomCacheSize" type="int" value="0"/>
 
        <!-- 避免錯誤回環過度拉扯地圖 -->
        <param name="RGBD/OptimizeMaxError" type="double" value="3.0"/>
        <param name="Rtabmap/LoopThr" type="double" value="0.15"/>
 
        <!-- 使用雷達進行幾何配準 -->
-       <param name="Reg/Strategy" type="int" value="2"/>
+       <param name="Reg/Strategy" type="int" value="1"/>
        <param name="Icp/Strategy" type="int" value="0"/>
        <param name="Icp/MaxCorrespondenceDistance"
               type="double"
@@ -101,17 +105,10 @@
               value="5"/>
 
        <!-- 建圖 -->
-       <param name="Mem/IncrementalMemory"
-              type="bool"
-              value="true"/>
-
-       <param name="Mem/InitWMWithAllNodes"
-              type="bool"
-              value="false"/>
-
-       <param name="Mem/LocalizationDataSaved"
-              type="bool"
-              value="false"/>
+       <!-- false 為純定位模式，true 為建圖模式 -->
+        <param name="Mem/IncrementalMemory" type="bool" value="$(eval 'false' if arg('localization') else 'true')"/>
+        <param name="Mem/InitWMWithAllNodes" type="bool" value="$(eval 'true' if arg('localization') else 'false')"/>
+        <param name="Mem/LocalizationDataSaved" type="bool" value="false"/>
 
        <!-- =========================
               Topic 映射

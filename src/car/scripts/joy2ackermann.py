@@ -23,6 +23,7 @@ class joy2ackermann:
         self.max_axis_x = 1.0
         self.max_axis_z = 1.0
         self.min_vx = 0.05
+        self.start_vx = 0.3
 
         self.vx = 0
         self.wz = 0
@@ -49,7 +50,7 @@ class joy2ackermann:
     def run(self):
         rate = rospy.Rate(self.publish_rate)
         while not rospy.is_shutdown():
-            #print("cmd-> ", self.vx, self.wz)
+            print("cmd-> ", self.vx, self.wz)
 
             ackermann_msg = AckermannDriveStamped()
             ackermann_msg.header.stamp = rospy.Time.now()
@@ -78,16 +79,15 @@ class joy2ackermann:
         yaw_rate = msg.angular.z
 
         if (abs(speed) < self.min_vx):
-            angle = 0
-        else:
-            angle = math.atan(self.wheelbase * yaw_rate / speed)
+            self.vx = 0
+            self.wz = 0
+            return 
 
-            speed = clamp(abs(speed), 0.5, 1)
-            
-            if (speed < 0):
-                speed *= -1
-            
-        print(speed, angle)
+        if self.min_vx <= abs(speed) < self.start_vx:
+            speed = math.copysign(self.start_vx, speed)
+
+        angle = math.atan(self.wheelbase * yaw_rate / speed)       
+
         self.vx = speed
         self.wz = angle
 

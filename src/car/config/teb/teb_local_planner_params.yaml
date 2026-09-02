@@ -26,17 +26,33 @@ TebLocalPlannerROS:
 
   # ***************** Ackermann Kinematics Settings *****************
   min_turning_radius: 0.5             # 機器人最小轉彎半徑 (米)，請根據實體車調整
-  wheelbase: 0.25                     # 前軸與後軸距離 (米)
+  wheelbase: 0.235                     # 前軸與後軸距離 (米)
   cmd_angle_towards_home: False
   # *****************************************************************
 
   # ===== Goal Tolerance =====
-  xy_goal_tolerance: 0.15             # 位置容忍度 (米)
-  yaw_goal_tolerance: 0.20            # 角度容忍度 (弧度，約 11.5 度)
-  free_goal_vel: False                # 抵達目標點時是否停止
+
+  # 距離目標 10 cm 內視為位置到達
+  xy_goal_tolerance: 0.10
+
+  # Ackermann 車不適合要求非常精準的原地朝向
+  yaw_goal_tolerance: 0.35
+
+  # 到終點速度必須為 0
+  free_goal_vel: false
+
+  # 要真正走完整條 global plan
+  complete_global_plan: true
+
+  # 判定已停止的線速度
+  trans_stopped_vel: 0.05
+
+  # 判定已停止的角速度
+  theta_stopped_vel: 0.05
 
   # ===== Obstacle Avoidance =====
-  min_obstacle_dist: 0.25             # 避障最小安全距離
+  min_obstacle_dist: 0.30
+  inflation_dist: 0.50          
   include_costmap_obstacles: True
   costmap_obstacles_behind_robot_dist: 1.0
   obstacle_poses_affected: 30
