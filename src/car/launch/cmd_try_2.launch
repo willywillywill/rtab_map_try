@@ -1,9 +1,20 @@
 <launch>
-    
+    <arg name="com_port" default="/dev/ttyUSB0" />
+    <arg name="lidar_port" default="/dev/ttyUSB1" />
+    <arg name="joy_dev" default="/dev/input/js0"/>
+
+    <!-- lidar -->
+    <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+            <param name="serial_port"         type="string" value="$(arg lidar_port)"/>
+            <param name="serial_baudrate"     type="int"    value="115200"/>
+            <param name="frame_id"            type="string" value="laser_link"/>
+            <param name="inverted"            type="bool"   value="false"/>
+            <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
     <!-- camera -->
     <include file="$(find astra_camera)/launch/astra_pro.launch">
         <arg name="camera_name" value="camera"/>
-        
         <arg name="depth_align" value="true"/>
         <arg name="enable_point_cloud" value="true"/>
         <arg name="enable_point_cloud_xyzrgb" value="true"/>
@@ -12,67 +23,43 @@
         <arg name="enable_ir" value="true"/>           
     </include>
 
-    <include file="$(find car)/launch/yolo_fast.launch">
-        <arg name="image_topic" value="/camera/color/image_raw"/>
-        <arg name="depth_topic" value="/camera/depth/image_raw"/>
-        <arg name="camera_info_topic" value="/camera/color/camera_info"/>
-        <arg name="model" value="$(find car)/models/yolo26n_ncnn_model"/>
-    </include>
-    <!--
-    <node pkg="car"
-        type="yolo.py"
-        name="yolo"
-        output="screen">
-        <env name="LD_PRELOAD" value="/usr/lib/aarch64-linux-gnu/libgomp.so.1" />
-        <param name="image_topic"
-            value="/camera/color/image_raw"/>
+    <!-- URDF  -->
+    <include file="$(find car)/launch/urdf.launch"/>
 
-        <param name="depth_topic"
-            value="/camera/depth/image_raw"/>
 
-        <param name="camera_info_topic"
-            value="/camera/color/camera_info"/>
-
-        <param name="model"
-            value="$(find car)/models/yolo26n_ncnn_model"/>
-
-        <param name="conf"
-            value="0.5"/>
-
-        <param name="iou"
-            value="0.45"/>
-
-        <param name="imgsz"
-            value="640"/>
-
-        <param name="device"
-            value="cpu"/>
-
-        <param name="inference_every_n_frames"
-            value="5"/>
-
-        <param name="depth_center_ratio"
-            value="0.4"/>
-
-        <param name="min_depth"
-            value="0.15"/>
-
-        <param name="max_depth"
-            value="8.0"/>
-
-        <rosparam param="dynamic_classes">
-            [
-                "person",
-                "bicycle",
-                "car",
-                "motorcycle",
-                "bus",
-                "truck",
-                "dog"
-            ]
-        </rosparam>
-
+    <node 
+        pkg="car"
+        type="yolo_try.py"
+        name="yolo_try">
+        <param name="model" value="$(find car)/models/yolo26n-seg_ncnn_model"/>
+        <param name="images_topic" value="/camera/color/image_raw"/>
     </node>
-    -->
+
+    <group ns="rtabmap">
+        <!-- 1. RGB-D 同步節點 -->
+        <node pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
+            <remap from="rgb/image"       to="/camera/color/image_raw"/>
+            <remap from="depth/image"     to="/camera/depth/image_raw"/>
+            <remap from="rgb/camera_info" to="/camera/color/camera_info"/>            
+            <remap from="rgb/mask"        to="/yolo_try/segment_mask"/> 
+            
+            <param name="approx_sync"     type="bool" value="true"/>
+            <param name="approx_sync_max_interval" type="double" value="0.02"/>
+        </node>
+
+        <!-- 2. RTAB-Map 主節點 -->
+        <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="--delete_db_on_start">
+            <param name="frame_id"        type="string" value="camera_link"/>
+            <param name="subscribe_depth" type="bool"   value="false"/>
+            <param name="subscribe_rgbd"  type="bool"   value="true"/>
+            <param name="frame_id" value="base_link"/>
+        <param name="map_frame_id" value="map"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="publish_tf" type="bool" value="true"/>
+        
+            <remap from="rgbd_image" to="rgbd_image"/>
+        </node>
+    </group>
+
 
 </launch>
