@@ -12,26 +12,29 @@
         <arg name="enable_ir" value="true"/>           
     </include>
 
+    <include file="$(find car)/launch/yolo_fast.launch">
+        <arg name="image_topic" value="/camera/color/image_raw"/>
+        <arg name="depth_topic" value="/camera/depth/image_raw"/>
+        <arg name="camera_info_topic" value="/camera/color/camera_info"/>
+        <arg name="model" value="$(find car)/models/yolo26n_ncnn_model"/>
+    </include>
+    <!--
     <node pkg="car"
         type="yolo.py"
         name="yolo"
         output="screen">
-
-        <!-- RGB -->
+        <env name="LD_PRELOAD" value="/usr/lib/aarch64-linux-gnu/libgomp.so.1" />
         <param name="image_topic"
             value="/camera/color/image_raw"/>
 
-        <!-- Depth -->
         <param name="depth_topic"
             value="/camera/depth/image_raw"/>
 
-        <!-- RGB Camera Intrinsics -->
         <param name="camera_info_topic"
             value="/camera/color/camera_info"/>
 
-        <!-- YOLO -->
         <param name="model"
-            value="/ros_ws/src/car/models/yolov8n.pt"/>
+            value="$(find car)/models/yolo26n_ncnn_model"/>
 
         <param name="conf"
             value="0.5"/>
@@ -45,11 +48,9 @@
         <param name="device"
             value="cpu"/>
 
-        <!-- 每張都辨識 -->
         <param name="inference_every_n_frames"
-            value="3"/>
+            value="5"/>
 
-        <!-- bbox 中央 40% 計算 depth -->
         <param name="depth_center_ratio"
             value="0.4"/>
 
@@ -72,5 +73,6 @@
         </rosparam>
 
     </node>
+    -->
 
 </launch>

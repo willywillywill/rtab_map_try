@@ -34,7 +34,7 @@ Output:
 
 import rospy
 import numpy as np
-
+import ncnn
 from sensor_msgs.msg import PointCloud2, Image
 from sensor_msgs import point_cloud2
 from cv_bridge import CvBridge
@@ -65,7 +65,7 @@ class DynamicPointCloudFilter:
 
         self.output_topic = rospy.get_param(
             "~output_topic",
-            "/camera/static_points"
+            "/yolo/static_points"
         )
 
         # Camera intrinsics
