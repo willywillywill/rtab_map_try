@@ -26,7 +26,6 @@
     <!-- URDF  -->
     <include file="$(find car)/launch/urdf.launch"/>
 
-
     <node 
         pkg="car"
         type="yolo_try.py"
@@ -34,32 +33,6 @@
         <param name="model" value="$(find car)/models/yolo26n-seg_ncnn_model"/>
         <param name="images_topic" value="/camera/color/image_raw"/>
     </node>
-
-    <group ns="rtabmap">
-        <!-- 1. RGB-D 同步節點 -->
-        <node pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
-            <remap from="rgb/image"       to="/camera/color/image_raw"/>
-            <remap from="depth/image"     to="/camera/depth/image_raw"/>
-            <remap from="rgb/camera_info" to="/camera/color/camera_info"/>            
-            <remap from="rgb/mask"        to="/yolo_try/segment_mask"/> 
-            
-            <param name="approx_sync"     type="bool" value="true"/>
-            <param name="approx_sync_max_interval" type="double" value="0.02"/>
-        </node>
-
-        <!-- 2. RTAB-Map 主節點 -->
-        <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="--delete_db_on_start">
-            <param name="frame_id"        type="string" value="camera_link"/>
-            <param name="subscribe_depth" type="bool"   value="false"/>
-            <param name="subscribe_rgbd"  type="bool"   value="true"/>
-            <param name="frame_id" value="base_link"/>
-        <param name="map_frame_id" value="map"/>
-        <param name="odom_frame_id" value="odom"/>
-        <param name="publish_tf" type="bool" value="true"/>
-        
-            <remap from="rgbd_image" to="rgbd_image"/>
-        </node>
-    </group>
 
 
 </launch>
