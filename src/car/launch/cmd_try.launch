@@ -1,7 +1,7 @@
 <launch>
 
-      <arg name="com_port" default="/dev/ttyUSB0" />
-      <arg name="lidar_port" default="/dev/ttyUSB1" />
+      <arg name="com_port" default="/dev/ttyUSB1" />
+      <arg name="lidar_port" default="/dev/ttyUSB0" />
       <arg name="joy_dev" default="/dev/input/js0"/>
 
       <!-- lidar -->

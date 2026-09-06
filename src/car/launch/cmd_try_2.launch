@@ -1,6 +1,6 @@
 <launch>
-    <arg name="com_port" default="/dev/ttyUSB0" />
-    <arg name="lidar_port" default="/dev/ttyUSB1" />
+    <arg name="com_port" default="/dev/ttyUSB1" />
+    <arg name="lidar_port" default="/dev/ttyUSB0" />
     <arg name="joy_dev" default="/dev/input/js0"/>
 
     <!-- lidar -->
@@ -23,16 +23,27 @@
         <arg name="enable_ir" value="true"/>           
     </include>
 
+    <!-- 將 30Hz 的 camera_info 降頻至 5Hz 以配合 yolo_try.py 的處理速度 -->
+    <node pkg="topic_tools" type="throttle" name="camera_info_throttler" 
+          args="messages /camera/color/camera_info 5.0 /camera/color/camera_info_throttled" />
+
     <!-- URDF  -->
     <include file="$(find car)/launch/urdf.launch"/>
+    <!-- joy_cmd  -->
+    <include file="$(find car)/launch/joy_cmd.launch">
+        <arg name="com_port" value="$(arg com_port)"/>
+        <arg name="joy_dev" value="$(arg joy_dev)"/>
+    </include>
 
     <node 
         pkg="car"
         type="yolo_try.py"
         name="yolo_try">
-        <param name="model" value="$(find car)/models/yolo26n-seg_ncnn_model"/>
-        <param name="images_topic" value="/camera/color/image_raw"/>
+        <param name="models" value="/ros_ws/src/car/models/yolo26n-seg_ncnn_model"/>
     </node>
+   <!-- rtabmap_lidar 
 
+      <include file="$(find car)/launch/rtabmap_try.launch"/>
+    -->
 
 </launch>

@@ -1,0 +1,130 @@
+<launch>
+       <!-- true：刪除舊資料庫並重新建圖 -->
+       <arg name="delete_db_on_start" default="true"/>
+       <arg name="database_path"
+         default="/ros_ws/src/car/maps/my_map.db"/>
+
+       <!-- 模式切換：true 為純定位模式，false 為建圖模式 -->
+       <arg name="localization" default="false"/>
+
+       <node pkg="rtabmap_slam"
+              type="rtabmap"
+              name="rtabmap"
+              output="screen"
+              args="$(eval '--delete_db_on_start' if arg('delete_db_on_start') == 'true' else '')">
+
+              <param name="database_path"
+                     type="string"
+                     value="$(arg database_path)"/>
+
+       <!-- =========================
+              TF 座標系
+              ========================= -->
+       <param name="frame_id" value="base_link"/>
+       <param name="map_frame_id" value="map"/>
+       <param name="odom_frame_id" value="odom"/>
+       <param name="publish_tf" type="bool" value="true"/>
+
+       <!-- =========================
+              感測器輸入
+              ========================= -->
+       <param name="subscribe_rgb" type="bool" value="true"/>
+       <param name="subscribe_depth" type="bool" value="true"/>
+       <param name="subscribe_scan" type="bool" value="true"/>
+       <param name="subscribe_odom_info" type="bool" value="false"/>
+
+       <!-- =========================
+              Topic 同步
+              ========================= -->
+       <param name="approx_sync" type="bool" value="true"/>
+       <param name="sync_queue_size" type="int" value="100"/>
+       <param name="topic_queue_size" type="int" value="100"/>
+
+       <!-- =========================
+              平面機器人
+              ========================= -->
+       <param name="Reg/Force3DoF" type="bool" value="true"/>
+
+       <!-- 每移動 15 cm 或旋轉約 8.6 度才新增節點 -->
+       <param name="RGBD/LinearUpdate" type="double" value="0.15"/>
+       <param name="RGBD/AngularUpdate" type="double" value="0.15"/>
+
+       <!-- 降低運算量 -->
+       <param name="Rtabmap/DetectionRate" type="double" value="2.0"/>
+       <param name="Mem/ImagePreDecimation" type="int" value="2"/>
+       <param name="Mem/ImagePostDecimation" type="int" value="1"/>
+
+       <!-- =========================
+              回環偵測
+              ========================= -->
+       <param name="RGBD/NeighborLinkRefining" type="bool" value="true"/>
+       <param name="RGBD/ProximityBySpace" type="bool" value="true"/>
+       <param name="RGBD/ProximityPathMaxNeighbors" type="int" value="5"/>
+       <param name="RGBD/MaxOdomCacheSize" type="int" value="0"/>
+
+       <!-- 避免錯誤回環過度拉扯地圖 -->
+       <param name="RGBD/OptimizeMaxError" type="double" value="3.0"/>
+       <param name="Rtabmap/LoopThr" type="double" value="0.15"/>
+
+       <!-- 使用雷達進行幾何配準 -->
+       <param name="Reg/Strategy" type="int" value="1"/>
+       <param name="Icp/Strategy" type="int" value="0"/>
+       <param name="Icp/MaxCorrespondenceDistance"
+              type="double"
+              value="0.15"/>
+       <param name="Icp/CorrespondenceRatio"
+              type="double"
+              value="0.20"/>
+       <param name="Icp/PointToPlane"
+              type="bool"
+              value="false"/>
+       <param name="Icp/VoxelSize"
+              type="double"
+              value="0.05"/>
+
+       <!-- =========================
+              2D Occupancy Grid
+              ========================= -->
+
+       <!-- 0：使用 LaserScan 建圖
+              1：使用深度影像建圖
+              2：兩者一起使用 -->
+       <param name="Grid/Sensor" type="int" value="2"/>
+
+       <param name="Grid/3D" type="bool" value="false"/>
+       <param name="Grid/CellSize" type="double" value="0.05"/>
+       <param name="Grid/RangeMin" type="double" value="0.25"/>
+       <param name="Grid/RangeMax" type="double" value="6.0"/>
+
+       <!-- 過濾孤立雜訊 -->
+       <param name="Grid/NoiseFilteringRadius"
+              type="double"
+              value="0.10"/>
+       <param name="Grid/NoiseFilteringMinNeighbors"
+              type="int"
+              value="5"/>
+
+       <!-- 建圖 -->
+       <!-- false 為純定位模式，true 為建圖模式 -->
+        <param name="Mem/IncrementalMemory" type="bool" value="$(eval 'false' if arg('localization') else 'true')"/>
+        <param name="Mem/InitWMWithAllNodes" type="bool" value="$(eval 'true' if arg('localization') else 'false')"/>
+        <param name="Mem/LocalizationDataSaved" type="bool" value="false"/>
+
+       <!-- =========================
+              Topic 映射
+              ========================= -->
+       <remap from="rgb/image"
+              to="/camera/color/image_filtered"/>
+
+       <!-- 優先使用已對齊彩色影像的深度影像 -->
+       <remap from="depth/image"
+              to="/camera/depth/image_filtered"/>
+
+       <remap from="rgb/camera_info"
+              to="/camera/color/camera_info"/>
+
+       <remap from="scan" to="/scan"/>
+       <remap from="odom" to="/odom"/>
+
+       </node>
+</launch>
